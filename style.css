@@ -1,0 +1,26 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#options-box {
+  position: absolute;
+  padding: 10px;
+}
+
+#container {
+  background-color: gray;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#num {
+  font-size: 200px;
+}

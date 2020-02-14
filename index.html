@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Face Off Game Assistant</title>
+  <link rel="stylesheet" type="text/css" title="Cool stylesheet" href="style.css">
+</head>
+<body>
+  <div id="root">
+    <div id="options-box">
+      <button type="button" name="options" id="options-button">Options</button>
+      <form id="options-form" style="display: none" onsubmit="return false;">
+        <input type="number" id="precent-random-question">
+        <label for="precent-random-question"><span id="precent-span"></span> of drawing random question</label>
+        <button id="submit-button" type="button" name="submit-button">Update</button>
+      </form>
+    </div>
+    <div id="container">
+      <p id="num"></p>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

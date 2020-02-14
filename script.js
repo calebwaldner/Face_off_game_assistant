@@ -18,9 +18,10 @@ const precentButton = document.getElementById("submit-button");
 const viewScreen = document.getElementById("container");
 const precentSpan = document.getElementById('precent-span');
 
-let precentOfSpecial = .5;
+let precentOfSpecial = 0;
 updateText(precentSpan, precentOfSpecial);
 let intervalID;
+let results = {book: 0, special: 0, spins: 0};
 
 // hide form with options button
 optionsButton.addEventListener("click", () => {
@@ -68,10 +69,15 @@ const randomInt = upper => Math.floor(Math.random()*upper)+1;
 const questionColorScreen = flag => {
   if (flag) {
     colorScreen('chartreuse');
+    getTextContent(true, numP);
+    results.special += 1;
   } else {
-    colorScreen('orangered');
+    colorScreen('lightblue');
+    getTextContent(false, numP);
+    results.book += 1;
   }
   console.log("spin");
+  spinAnimation(true); //placed here to visually show if spin actually happened. If animation showed, spin happened for sure.
 }
 
 const numP = document.getElementById("num");
@@ -79,25 +85,33 @@ const numP = document.getElementById("num");
 document.addEventListener('keydown', pickRandom);
 document.addEventListener('keyup', endPickRandom);
 
-function endPickRandom() {
-  numP.textContent = "False";
-  spin(false);
-}
-
-function pickRandom(e) {
+//callback for keyup eventListener
+function endPickRandom(e) {
   if (e.code === "Space") {
-    numP.textContent = "True";
-    spin(true);
-  } else {
-    endPickRandom(); //needs to be a seperate function to help with accuracy
+    spinAnimation(false);
+    spin(false);
+    console.log(`${(results.book/results.spins*100).toFixed(2)}% book, ${(results.special/results.spins*100).toFixed(2)}% special`);
   }
 }
 
-function intCallback() {
- questionColorScreen(specialQuestion());
- console.log(intervalID);
+//callback for keydown eventListener
+function pickRandom(e) {
+  if (e.code === "Space") {
+    if (e.repeat) {return}
+    results.book = 0;
+    results.special = 0;
+    results.spins = 0;
+    spin(true);
+  }
 }
 
+//used as call back to repeat with spin() function
+function intCallback() {
+ questionColorScreen(specialQuestion()); //function that determins question
+ results.spins += 1;
+}
+
+//turns interval off and on, if flag is true it intervals intCallback function, clears interval if false
 function spin(flag) {
   if (flag) {
     intervalID = setInterval(intCallback, 50);
@@ -106,21 +120,51 @@ function spin(flag) {
   }
 }
 
-// BUG: the setInterval methods are stacking. So by the time the clearInterval method runs with the current interval reference there are several intervals running at once. 
+//turns spin animation on/off
+function spinAnimation(flag) {
+  if (flag) {
+    viewScreen.style.border = "solid 50px red";
+  } else {
+    viewScreen.style.border = "solid 50px black";
+  }
+}
+
+//determins text content
+function getTextContent(flag, textElement) {
+  if (flag) { //if special question
+    let catagory;
+    let randomCatNum = randomInt(catagoryList.length);
+    for (i=0;i<catagoryList.length;i++) {
+      if (i+1 === randomCatNum) {catagory = catagoryList[i]}
+    }
+    textElement.textContent = catagory;
+  } else {
+    textElement.textContent = "Book";
+  }
+}
+
+
+
+
+// TODO: add the type of question to the special question function
+// TODO: rather than true/false on screen during game, have a visual feature that the button is being pressed or not pressed some other way. The true/false can come through visually another way.
+
+// BUG: if you press the space button super fast the endPickRandom() function runs before the screen ever changes color, allowing a crafty user to quickly tap the space bar but never engage a "spin". Solution would be a flag at the beginning and end of the spin functionality which was true as spin was initializing and false after the spin started which would be used to throw a message up to the user that the spin never happened on their key press and they need to press again. Black border added to help with this, but it still be fixed
 
 
 
 
 //just for counting a bunch of the specialQuestion results
+// in console: counterApp(100, precentOfSpecial)
 const counterApp = (countTo, precent) => {
   let results = {true: 0, false: 0};
   for (i=0;i<countTo; i++) {
-    let tf = specialQuestion(precent);
+    let tf = specialQuestion();
     if (tf === true) {
       results.true += 1;
     } else {
       results.false += 1;
     }
   }
-  console.log(`${(results.true/countTo*100).toFixed(2)}% true, ${(results.false/countTo*100).toFixed(2)}% false`);
+  return `${(results.true/countTo*100).toFixed(2)}% true, ${(results.false/countTo*100).toFixed(2)}% false`;
 }

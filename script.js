@@ -1,3 +1,4 @@
+let precentOfSpecial = 0;
 const catagoryList = [
   'Sports',
   'Technology',
@@ -18,10 +19,9 @@ const precentButton = document.getElementById("submit-button");
 const viewScreen = document.getElementById("container");
 const precentSpan = document.getElementById('precent-span');
 
-let precentOfSpecial = 0;
-updateText(precentSpan, precentOfSpecial);
+updateText(precentSpan, precentOfSpecial); // BUG: if I edit the starting precent in the code it shows up wrong in the text
 let intervalID;
-let results = {book: 0, special: 0, spins: 0};
+let results = {book: 0, special: 0, spins: 0, bookLog: 0, specialLog: 0};
 
 // hide form with options button
 optionsButton.addEventListener("click", () => {
@@ -56,9 +56,9 @@ const randomNum = () => Math.random();
 const randomInt = upper => Math.floor(Math.random()*upper)+1;
 
 //gets random number and compares to precent, returns boolean
-  const specialQuestion = () => {
+  const specialQuestion = precent => {
   let num = randomNum();
-  if (precentOfSpecial>num) {
+  if (precent>num) {
     return true;
   } else {
     return false;
@@ -71,10 +71,12 @@ const questionColorScreen = flag => {
     colorScreen('chartreuse');
     getTextContent(true, numP);
     results.special += 1;
+    results.bookSelected = false;
   } else {
-    colorScreen('lightblue');
+    colorScreen('deepskyblue');
     getTextContent(false, numP);
     results.book += 1;
+    results.bookSelected = true;
   }
   console.log("spin");
   spinAnimation(true); //placed here to visually show if spin actually happened. If animation showed, spin happened for sure.
@@ -84,6 +86,7 @@ const numP = document.getElementById("num");
 
 document.addEventListener('keydown', pickRandom);
 document.addEventListener('keyup', endPickRandom);
+// TODO: add touch functionality: "touchstart", "touchend", "touchcancel"
 
 //callback for keyup eventListener
 function endPickRandom(e) {
@@ -91,6 +94,17 @@ function endPickRandom(e) {
     spinAnimation(false);
     spin(false);
     console.log(`${(results.book/results.spins*100).toFixed(2)}% book, ${(results.special/results.spins*100).toFixed(2)}% special`);
+    if (results.spins>0) {
+      if (results.bookSelected) { //updates log count to console
+        results.bookLog += 1;
+      } else {
+        results.specialLog += 1;
+      }
+      console.log(`So far ${results.bookLog + results.specialLog} total, ${results.bookLog} books, ${results.specialLog} special`);
+    } else {
+      numP.textContent = "Press longer!";
+      colorScreen('gray');
+    }
   }
 }
 
@@ -107,14 +121,14 @@ function pickRandom(e) {
 
 //used as call back to repeat with spin() function
 function intCallback() {
- questionColorScreen(specialQuestion()); //function that determins question
+ questionColorScreen(specialQuestion(precentOfSpecial)); //function that determins question
  results.spins += 1;
 }
 
 //turns interval off and on, if flag is true it intervals intCallback function, clears interval if false
 function spin(flag) {
   if (flag) {
-    intervalID = setInterval(intCallback, 50);
+    intervalID = setInterval(intCallback, 100);
   } else {
     clearInterval(intervalID);
   }
@@ -149,14 +163,12 @@ function getTextContent(flag, textElement) {
 // TODO: add the type of question to the special question function
 // TODO: rather than true/false on screen during game, have a visual feature that the button is being pressed or not pressed some other way. The true/false can come through visually another way.
 
-// BUG: if you press the space button super fast the endPickRandom() function runs before the screen ever changes color, allowing a crafty user to quickly tap the space bar but never engage a "spin". Solution would be a flag at the beginning and end of the spin functionality which was true as spin was initializing and false after the spin started which would be used to throw a message up to the user that the spin never happened on their key press and they need to press again. Black border added to help with this, but it still be fixed
-
 
 
 
 //just for counting a bunch of the specialQuestion results
 // in console: counterApp(100, precentOfSpecial)
-const counterApp = (countTo, precent) => {
+const counterApp = (countTo) => {
   let results = {true: 0, false: 0};
   for (i=0;i<countTo; i++) {
     let tf = specialQuestion();

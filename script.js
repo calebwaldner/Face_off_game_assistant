@@ -1,4 +1,21 @@
+console.log(`
+Copy and paste this in console:
+window.open("file:///Users/Waldner/Dropbox/On_Macbook_Air/WebDev/Mini_Projects/Face_off_game_assistant/index.html", 'window','toolbar=no, menubar=no, resizable=yes');
+`)
+
+
+/************************************************************************************
+Global Variables
+************************************************************************************/
+
 let precentOfSpecial = 0;
+let intervalID;
+let results = {book: 0, special: 0, spins: 0, bookLog: 0, specialLog: 0};
+
+/************************************************************************************
+Options Window
+************************************************************************************/
+
 const catagoryList = [
   'Sports',
   'Technology',
@@ -14,21 +31,26 @@ const catagoryList = [
 
 const optionsButton = document.getElementById("options-button");
 const optionsForm = document.getElementById("options-form");
+const optionsContainer = document.getElementById("options-box");
+const optionsWindow = document.getElementById("options-window");
 const precentInput = document.getElementById("precent-random-question")
 const precentButton = document.getElementById("submit-button");
-const viewScreen = document.getElementById("container");
 const precentSpan = document.getElementById('precent-span');
 
+function changeButtonText(text) {
+  optionsButton.innerText = text;
+}
+
 updateText(precentSpan, precentOfSpecial); // BUG: if I edit the starting precent in the code it shows up wrong in the text
-let intervalID;
-let results = {book: 0, special: 0, spins: 0, bookLog: 0, specialLog: 0};
 
 // hide form with options button
 optionsButton.addEventListener("click", () => {
-  if (optionsForm.style.display === "none") {
-    optionsForm.style.display = "block";
+  if (optionsWindow.style.display === "none" || optionsWindow.style.display === "") {
+    optionsWindow.style.display = "block";
+    changeButtonText("hide");
   } else {
-    optionsForm.style.display = "none";
+    optionsWindow.style.display = "none";
+    changeButtonText("+");
   }
 });
 
@@ -40,13 +62,18 @@ function updateText(span, value) {
   span.textContent = `${value}%`;
 }
 
-
 //get precent on button click and input enter
 precentButton.addEventListener("click", () => {
   setPrecent();
   updateText(precentSpan, precentInput.value);
 });
 // TODO: Add "return" key functionality (currently disabled)
+
+/************************************************************************************
+Game Screen
+************************************************************************************/
+
+const viewScreen = document.getElementById("container");
 
 const colorScreen = color => {
   viewScreen.style.backgroundColor = color;

@@ -12,6 +12,13 @@ body {
   padding: 10px;
 }
 
+#options-window {
+  background: hsla(0,0%,100%,.6);
+  background-color: black;
+  padding: 10px;
+  display: none;
+}
+
 #options-button {
   background-color: transparent;
   color: white;

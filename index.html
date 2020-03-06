@@ -14,8 +14,18 @@
         <form id="options-form" onsubmit="return false;">
           <div class="options-section"> <!--Using div rather than feildset because feildset element has bugs within Chrome-->
             <input type="number" id="precent-random-question">
-            <label for="precent-random-question"><span id="precent-span"></span> of drawing random question</label>
+            <label for="precent-random-question"><span id="precent-span"></span> of drawing secondary question</label>
             <button id="submit-button" type="button" name="submit-button">Update</button>
+          </div>
+          <div class="options-section group" id="primary-catagories-div">
+            <label for="primary-catagories">Primary Catagories</label>
+            <button id="primary-catagories-button" type="button" data-array="primaryQuestionsArr">Edit</button><br>
+            <span id="primary-catagories-span"></span>
+          </div>
+          <div class="options-section group" id="secondary-catagories-div">
+            <label for="secondary-catagories">Secondary Catagories</label>
+            <button id="secondary-catagories-button" type="button" data-array="secondarQuestionsArr">Edit</button><br>
+            <span id="secondary-catagories-span"></span>
           </div>
         </form>
       </div>

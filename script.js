@@ -15,27 +15,35 @@ let results = {book: 0, special: 0, spins: 0, bookLog: 0, specialLog: 0};
 /************************************************************************************
 Options Window
 ************************************************************************************/
-
-const catagoryList = [
-  'Sports',
-  'Technology',
-  'Science',
-  'Auto',
-  'Food & Drink',
-  'Health',
-  'Geography',
-  'Music',
-  'Movies & TV',
-  'Animals'
-];
+const questionCatagories = {
+  primaryQuestionsArr: [
+    "Book"
+  ],
+  secondarQuestionsArr: [
+    'Sports',
+    'Technology',
+    'Science',
+    'Auto',
+    'Food & Drink',
+    'Health',
+    'Geography',
+    'Music',
+    'Movies & TV',
+    'Animals'
+  ]
+};
 
 const optionsButton = document.getElementById("options-button");
 const optionsForm = document.getElementById("options-form");
 const optionsContainer = document.getElementById("options-box");
 const optionsWindow = document.getElementById("options-window");
-const precentInput = document.getElementById("precent-random-question")
+const precentInput = document.getElementById("precent-random-question");
 const precentButton = document.getElementById("submit-button");
 const precentSpan = document.getElementById('precent-span');
+const primaryCatagorySpan = document.getElementById("primary-catagories-span");
+const secondaryCatagorySpan = document.getElementById("secondary-catagories-span");
+const primaryCatagoryButton = document.getElementById("primary-catagories-button");
+const secondaryCatagoryButton = document.getElementById("secondary-catagories-button");
 
 function changeButtonText(text) {
   optionsButton.innerText = text;
@@ -68,6 +76,122 @@ precentButton.addEventListener("click", () => {
   updateText(precentSpan, precentInput.value);
 });
 // TODO: Add "return" key functionality (currently disabled)
+
+/**
+ * write catagories in span element
+ * @param catagoryArr 
+ */
+function writeCatagorySpan(catagoryArr, span) {
+  const list = catagoryArr.join(", ");
+  span.innerText = list;
+}
+
+function createTextInput() {
+  const input = document.createElement("INPUT");
+  input.classList = "catagory-input";
+  return input;
+}
+
+/**
+ * replace array strings AKA catagories with text inputs
+ */
+function editCatagories(arr, div) {
+  const inputDiv = document.createElement("DIV");
+  questionCatagories[arr].forEach(catagory => {
+    const input = createTextInput();
+    input.value = catagory;
+    inputDiv.appendChild(input);
+  });
+  div.appendChild(inputDiv);
+  div.querySelector("span").innerText = "";
+  appendEditButtons(div);
+}
+
+/**
+ * Creates and adds the two edit buttons to the element parameter
+ * @param {element} div 
+ */
+function appendEditButtons(div) {
+  const buttonsDiv = document.createElement("DIV");
+  buttonsDiv.style.display = "block";
+
+  const addButton = document.createElement("INPUT");
+  addButton.type = "button";
+  addButton.value = "Add";
+  addButton.classList = "edit-buttons";
+
+  const deleteButton = document.createElement("INPUT");
+  deleteButton.type = "button";
+  deleteButton.value = "Delete";
+  deleteButton.classList = "edit-buttons";
+
+  buttonsDiv.appendChild(deleteButton);
+  buttonsDiv.appendChild(addButton);
+  div.appendChild(buttonsDiv);
+}
+
+/**
+ * Gives the Add and Delete buttons functionality; stores functions in an object literal and dynamically calls functions
+ * @param {event} e 
+ */
+function addAndDeleteButtons(e) {
+  const button = e.target.value;
+  const actionButton = {
+    Delete: (div) => {
+      let lastChild = div.children[div.children.length-1];
+      lastChild && div.removeChild(lastChild); //if last child is truthy (prevents error for undefined last child caused when there are no more children);
+    }, 
+    Add: (div) => {
+      const input = createTextInput();
+      div.appendChild(input);
+    }
+  }
+  //if button is one of the properties of actionButton object, then do that property
+  if (actionButton[button]) {
+    const targetDiv = e.target.parentElement.previousElementSibling;
+    actionButton[button](targetDiv);
+  };
+}
+
+
+/**
+ * save and replace text inputs with array strings AKA catagories
+ */
+function saveCatagories(arr, div) {
+  const editButtonsDiv = div.lastElementChild;
+  const inputDiv = editButtonsDiv.previousElementSibling;
+  const inputs = inputDiv.querySelectorAll("input.catagory-input");
+  questionCatagories[arr] = [];
+  inputs.forEach((input, i) => {
+    questionCatagories[arr][i] = input.value;
+  });
+  div.removeChild(inputDiv);
+  div.removeChild(editButtonsDiv);
+  writeCatagorySpan(questionCatagories[arr], div.querySelector("span"));
+}
+
+/**
+ * Runs save and edit functionality
+ */
+function catagoryButtonClick(e) {
+  const parent = e.target.parentElement;
+  const arr = e.target.dataset.array;
+  if (e.target.innerText === "Edit") {
+    e.target.innerText = "Save";
+    editCatagories(arr, parent)
+  } else if (e.target.innerText === "Save") {
+    e.target.innerText = "Edit";
+    saveCatagories(arr, parent);
+  }
+}
+
+primaryCatagoryButton.addEventListener("click", catagoryButtonClick);
+secondaryCatagoryButton.addEventListener("click", catagoryButtonClick);
+
+optionsForm.addEventListener("click", addAndDeleteButtons);
+
+writeCatagorySpan(questionCatagories.primaryQuestionsArr, primaryCatagorySpan);
+writeCatagorySpan(questionCatagories.secondarQuestionsArr, secondaryCatagorySpan);
 
 /************************************************************************************
 Game Screen
@@ -170,20 +294,47 @@ function spinAnimation(flag) {
   }
 }
 
-//determins text content
-function getTextContent(flag, textElement) {
-  if (flag) { //if special question
-    let catagory;
-    let randomCatNum = randomInt(catagoryList.length);
-    for (i=0;i<catagoryList.length;i++) {
-      if (i+1 === randomCatNum) {catagory = catagoryList[i]}
-    }
-    textElement.textContent = catagory;
-  } else {
-    textElement.textContent = "Book";
+
+
+/************************************************************************************
+NOT SORTED IN RIGHT SPOT, THIS WAS ADDED IN PLACE OF CODE BELOW TO ADD MORE OPTIONS TO THE BOOK CATAGORY
+************************************************************************************/
+
+// //determins text content
+// function getTextContent(flag, textElement) {
+//   if (flag) { //if special question
+//     let catagory;
+//     let randomCatNum = randomInt(questionCatagories.secondarQuestionsArr.length);
+//     for (i=0;i<questionCatagories.secondarQuestionsArr.length;i++) {
+//       if (i+1 === randomCatNum) {catagory = questionCatagories.secondarQuestionsArr[i]}
+//     }
+//     textElement.textContent = catagory;
+//   } else {
+//     textElement.textContent = "Book";
+//   }
+// }
+
+
+
+function typeOfQuestion(questionArr) {
+  let question;
+  let randomDifNum = randomInt(questionArr.length);
+  for (i=0;i<questionArr.length;i++) {
+    if (i+1 === randomDifNum) {question = questionArr[i]}
   }
+  return question;
 }
 
+
+//determins text content
+function getTextContent(flag, textElement) {
+  if (flag) { 
+    textElement.textContent = typeOfQuestion(questionCatagories.secondarQuestionsArr);
+  } else {
+    // textElement.textContent = "Book";
+    textElement.textContent = typeOfQuestion(questionCatagories.primaryQuestionsArr);
+  }
+}
 
 
 
